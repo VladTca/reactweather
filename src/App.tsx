@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import {useState} from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+    //https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+    const [city, setCity] = useState<string>('')
+    const [error, setError] = useState<string | null>(null)
+    const [weather, setWeather] = useState<{temp: number,description: string} | null>(null)
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const fetchWeather = () => {
+        const apiKey = "80bed376c413d9670428f732fef045bf"
+
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`)
+            .then(response => response.json())
+            .then(json => {
+                if (json.cod === '404') {
+                    setError('City not found')
+                    setWeather(null)
+                } else {
+                    setWeather({temp: json.main.temp, description: json.weather[0].description})
+                    setError(null)
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error)
+                setError('An error occurred. Please try again later.')
+                setWeather(null)
+            })
+
+    }
+
+
+    return (
+        <div className="App">
+            <h1>Weather App</h1>
+            <div>{city}</div>
+            <div>{weather ? <p>{weather.temp}°C, {weather.description}</p> : null}</div>
+            <input type="text" value={city} onChange={(e) => setCity(e.currentTarget.value)}/>
+            <button onClick={fetchWeather}>Get Weather</button>
+            <p style={{color: 'red'}}>{error ? error : null}</p>
+        </div>
+    )
 }
 
 export default App
