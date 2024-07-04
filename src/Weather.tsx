@@ -1,13 +1,14 @@
-// @flow 
-import * as React from 'react';
+
 
 type Props = {
-    
+    temp: number
+    description: string
 };
-export const Weather = (props: Props) => {
+export const Weather = ({temp, description}: Props) => {
     return (
-        <div>
-
+        <div className="weather">
+            <p>Temperature: {temp} °C</p>
+            <p>Weather: {description}</p>
         </div>
     );
 };
